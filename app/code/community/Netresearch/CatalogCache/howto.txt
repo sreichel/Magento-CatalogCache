@@ -1,0 +1,12 @@
+To enable caching simply change the following xml-configuration in the file
+
+app/design/frontend/[[YOUR_PACKAGE]]/[[YOUR_SKIN]]/layout/catalog.xml
+
+            change
+			
+			<block type="catalog/product_view" name="product.info" template="catalog/product/view.phtml">
+                          ------------
+			to
+			
+            <block type="catalogcache/product_view" name="product.info" template="catalog/product/view.phtml">
+                          ----------------
