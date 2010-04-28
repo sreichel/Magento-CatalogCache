@@ -40,12 +40,15 @@ class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Pro
 {
 	protected function _isCacheActive()
 	{
-		if(!Mage::getStoreConfig('catalog/frontend/cache_view')) {
+        if(!Mage::getStoreConfig('catalog/frontend/cache_view')) {
 			return false;
 		}
 
 		/* if there are any messages dont read from cache to show them */
-		if(Mage::getSingleton('core/session')->getMessages(true)->count() > 0) {
+		if(
+			Mage::getSingleton('core/session')->getMessages(true)->count() > 0 ||
+			$this->getMessagesBlock()->getMessages()
+		) {
 			return false;
 		}
 
@@ -59,14 +62,13 @@ class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Pro
 			return false;
 		}
 	}
-/*
 	protected function _loadCache()
 	{
         $cache = parent::_loadCache();
 		Mage::debug($cache===false? "computed":"from cache");
 		return $cache;
 	}
-*/
+
     public function getCacheKey()
     {
 		if(!$this->_isCacheActive()) {
