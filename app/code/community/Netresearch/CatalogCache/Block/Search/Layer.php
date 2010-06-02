@@ -28,7 +28,6 @@ class Netresearch_CatalogCache_Block_Search_Layer extends Mage_CatalogSearch_Blo
 {
 	protected function _isCacheActive()
 	{
-		Mage::debug("ööö");
         if(!Mage::getStoreConfig('catalog/frontend/cache_list')) {
 			return false;
 		}
@@ -48,12 +47,7 @@ class Netresearch_CatalogCache_Block_Search_Layer extends Mage_CatalogSearch_Blo
 			return false;
 		}
 	}
-	protected function _loadCache()
-	{
-		$cache = parent::_loadCache();
-		Mage::debug($cache === false ? "computed" : "from cache");
-		return $cache;
-	}
+
     public function getCacheKey()
     {
 		if(!$this->_isCacheActive()) {

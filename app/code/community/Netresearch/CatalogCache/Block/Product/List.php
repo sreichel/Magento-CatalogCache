@@ -56,13 +56,6 @@ class Netresearch_CatalogCache_Block_Product_List extends Mage_Catalog_Block_Pro
 		}
 	}
 
-    protected function _loadCache()
-    {
-        $cache = parent::_loadCache();
-		Mage::debug($cache === false ? "computed" : "from cache");
-		return $cache;
-	}
-
     public function getCacheKey()
     {
 		if(!$this->_isCacheActive()) {

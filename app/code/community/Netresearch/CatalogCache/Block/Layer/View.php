@@ -36,7 +36,6 @@ class Netresearch_CatalogCache_Block_Layer_View extends Mage_Catalog_Block_Layer
 {
 	protected function _isCacheActive()
 	{
-		Mage::debug("ööö");
         if(!Mage::getStoreConfig('catalog/frontend/cache_list')) {
 			return false;
 		}
@@ -55,12 +54,6 @@ class Netresearch_CatalogCache_Block_Layer_View extends Mage_Catalog_Block_Layer
 		{
 			return false;
 		}
-	}
-	protected function _loadCache()
-	{
-		$cache = parent::_loadCache();
-		Mage::debug($cache === false ? "computed" : "from cache");
-		return $cache;
 	}
     public function getCacheKey()
     {
@@ -112,9 +105,6 @@ class Netresearch_CatalogCache_Block_Layer_View extends Mage_Catalog_Block_Layer
 			Mage_Catalog_Model_Category::CACHE_TAG,
 			Mage_Catalog_Model_Category::CACHE_TAG.'_'.$this->_category->getId()
 		);
-		foreach($this->_getProductCollection() as $_product) {
-			$cacheTags[] = Mage_Catalog_Model_Product::CACHE_TAG."_".$_product->getId();
-		}
 		return $cacheTags;
 	}
 }
