@@ -66,7 +66,7 @@ class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Pro
     public function getCacheKey()
     {
 		if(!$this->_isCacheActive()) {
-			parent::getCacheKey();
+			return parent::getCacheKey();
 		}
 		$_taxCalculator = Mage::getModel('tax/calculation');
 		$_customer = Mage::getSingleton('customer/session')->getCustomer();
@@ -77,8 +77,10 @@ class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Pro
 			$_product->getId().'_'.
 			/* ... for different stores */
 			Mage::App()->getStore()->getCode().'_'.
+			/* ... for differnet login state */
+			$this->helper('customer')->isLoggedIn().'_'.
 			/* ... for different customer groups */
-			$_customer->getGroupId().'_'.
+            $_customer->getGroupId().'_'.
 			/* ... for different tax classes (related to customer and product) */
 			$_taxCalculator->getRate(
 				$_taxCalculator
