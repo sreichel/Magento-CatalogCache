@@ -37,6 +37,11 @@
  -->
 
 <config>
+    <modules>
+        <Netresearch_CatalogCache>
+            <version>0.1.0</version>
+        </Netresearch_CatalogCache>
+    </modules>
   <global>
     <blocks>
         <catalog>
