@@ -28,81 +28,74 @@
 /**
  * Rewrite of Product view to enable caching
  *
+ * replace this parent class by your inhereted version of th Product_View Block
+ * e.g. class Netresearch_CatalogCache_Block_Product extends MyNameSpace_MyModule_Catalog_Block_Product_View
+ *
  * @category   Netresearch
  * @package    Netresearch_CatalogCache
  * @author     Netresearch <info@netresearch.de>
  */
 class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Product_View
-/**
- * replace this parent class by your inhereted version of th Product_View Block
- * e.g. class Netresearch_CatalogCache_Block_Product extends MyNameSpace_MyModule_Catalog_Block_Product_View
- */
 {
-	protected function _isCacheActive()
-	{
-        if(!Mage::getStoreConfig('catalog/frontend/cache_view')) {
-			return false;
-		}
+    protected function _isCacheActive()
+    {
+        if (!Mage::getStoreConfig('catalog/frontend/cache_view')) {
+            return false;
+        }
 
-		/* if there are any messages dont read from cache to show them */
-		if(
-			Mage::getSingleton('core/session')->getMessages(true)->count() > 0 ||
-			$this->getMessagesBlock()->getMessages()
-		) {
-			return false;
-		}
+        /* if there are any messages dont read from cache to show them */
+        if (0 < Mage::getSingleton('core/session')->getMessages(true)->count()
+            || $this->getMessagesBlock()->getMessages()
+        ) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public function getCacheLifetime()
-	{
-		if($this->_isCacheActive())
-		{
-			return false;
-		}
-	}
+    public function getCacheLifetime()
+    {
+        if ($this->_isCacheActive()) {
+            return false;
+        }
+    }
 
     public function getCacheKey()
     {
-		if(!$this->_isCacheActive()) {
-			return parent::getCacheKey();
-		}
-		$_taxCalculator = Mage::getModel('tax/calculation');
-		$_customer = Mage::getSingleton('customer/session')->getCustomer();
-		$_product = $this->getProduct();
+        if (!$this->_isCacheActive()) {
+            return parent::getCacheKey();
+        }
+        $_taxCalculator = Mage::getModel('tax/calculation');
+        $_customer = Mage::getSingleton('customer/session')->getCustomer();
+        $_product = $this->getProduct();
         return 'ProductView'.
-			/* Create differnet caches for ...
-			 * ... for different products */
-			$_product->getId().'_'.
-			/* ... for different stores */
-			Mage::App()->getStore()->getCode().'_'.
+            /* Create different caches for different products */
+            $_product->getId().'_'.
+            /* ... for different stores */
+            Mage::App()->getStore()->getCode().'_'.
             /* ... currency */
             Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
-			/* ... for differnet login state */
-			$this->helper('customer')->isLoggedIn().'_'.
-			/* ... for different customer groups */
+            /* ... for different login state */
+            $this->helper('customer')->isLoggedIn().'_'.
+            /* ... for different customer groups */
             $_customer->getGroupId().'_'.
-			/* ... for different tax classes (related to customer and product) */
-			$_taxCalculator->getRate(
-				$_taxCalculator
-					->getRateRequest()
-					->setProductClassId($_product->getTaxClassId()
-				)
-			).'_'.
-			'';
-	}
+            /* ... for different tax classes (related to customer and product) */
+            $_taxCalculator->getRate(
+                $_taxCalculator
+                ->getRateRequest()
+                ->setProductClassId($_product->getTaxClassId())
+            ).'_';
+    }
 
 
     public function getCacheTags()
     {
-		if(!$this->_isCacheActive()) {
-			return parent::getCacheTags();
-		}
-		return array(
-			Mage_Catalog_Model_Product::CACHE_TAG,
-			Mage_Catalog_Model_Product::CACHE_TAG."_".$this->getProduct()->getId()
-		);
-
-	}
+        if (!$this->_isCacheActive()) {
+            return parent::getCacheTags();
+        }
+        return array(
+            Mage_Catalog_Model_Product::CACHE_TAG,
+            Mage_Catalog_Model_Product::CACHE_TAG."_".$this->getProduct()->getId()
+        );
+    }
 }

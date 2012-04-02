@@ -34,79 +34,80 @@
  */
 class Netresearch_CatalogCache_Block_Layer_View extends Mage_Catalog_Block_Layer_View
 {
-	protected function _isCacheActive()
-	{
-        if(!Mage::getStoreConfig('catalog/frontend/cache_list')) {
-			return false;
-		}
+    protected function _isCacheActive()
+    {
+        if (!Mage::getStoreConfig('catalog/frontend/cache_list')) {
+            return false;
+        }
 
-		/* if there are any messages dont read from cache to show them */
-		if(Mage::getSingleton('core/session')->getMessages(true)->count() > 0) {
-			return false;
-		}
-		return true;
+        /* if there are any messages dont read from cache to show them */
+        if (Mage::getSingleton('core/session')->getMessages(true)->count() > 0) {
+            return false;
+        }
+        return true;
 
-	}
+    }
 
-	public function getCacheLifetime()
-	{
-		if($this->_isCacheActive())
-		{
-			return false;
-		}
-	}
+    public function getCacheLifetime()
+    {
+        if ($this->_isCacheActive()) {
+            return false;
+        }
+    }
+
     public function getCacheKey()
     {
-		if(!$this->_isCacheActive()) {
-			parent::getCacheKey();
-		}
-		$_taxRateRequest = Mage::getModel('tax/calculation')->getRateRequest();
-		$_customer = Mage::getSingleton('customer/session')->getCustomer();
-		$this->_category = Mage::getSingleton('catalog/layer')->getCurrentCategory();
-		$_page = $this->getPage();
+        if (!$this->_isCacheActive()) {
+            parent::getCacheKey();
+        }
+        $_taxRateRequest = Mage::getModel('tax/calculation')->getRateRequest();
+        $_customer = Mage::getSingleton('customer/session')->getCustomer();
+        $this->_category = Mage::getSingleton('catalog/layer')->getCurrentCategory();
+        $_page = $this->getPage();
 
-		$toolbar = new Mage_Catalog_Block_Product_List_Toolbar();
-		$return = 'ProductLayerView_'.
-			/* Create differnet caches for differnt...
-			 * ... categories */
-			$this->_category->getId().'_'.
-			/* ... orders */
-			$toolbar->getCurrentOrder().'_'.
-			/* ... direction */
-			$toolbar->getCurrentDirection().'_'.
-			/* ... mode */
-			$toolbar->getCurrentMode().'_'.
-			/* ... page */
-			$toolbar->getCurrentPage().'_'.
-			/* ... items per page */
-			$toolbar->getLimit().'_'.
-			/* ... stores */
-			Mage::App()->getStore()->getCode().'_'.
+        $toolbar = new Mage_Catalog_Block_Product_List_Toolbar();
+        $cacheKey = 'ProductLayerView_'.
+            /* Create different caches for different categories */
+            $this->_category->getId().'_'.
+            /* ... orders */
+            $toolbar->getCurrentOrder().'_'.
+            /* ... direction */
+            $toolbar->getCurrentDirection().'_'.
+            /* ... mode */
+            $toolbar->getCurrentMode().'_'.
+            /* ... page */
+            $toolbar->getCurrentPage().'_'.
+            /* ... items per page */
+            $toolbar->getLimit().'_'.
+            /* ... stores */
+            Mage::App()->getStore()->getCode().'_'.
             /* ... currency */
             Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
-			/* ... customer groups */
-			$_customer->getGroupId().'_'.
-			$_taxRateRequest->getCountryId()."_".$_taxRateRequest->getRegionId()."_".$_taxRateRequest->getPostcode()."_".$_taxRateRequest->getCustomerClassId()."_".
-			/* ... tags */
-			Mage::registry('current_tag').'_'.
-			'';
-			/* ... layern navigation + search */
-            foreach(Mage::app()->getRequest()->getParams() as $key=>$value) {
-                $return .= $key.'-'.$value.'_';
-            }
-        return $return;
-	}
-
+            /* ... customer groups */
+            $_customer->getGroupId().'_'.
+            $_taxRateRequest->getCountryId()."_".
+            $_taxRateRequest->getRegionId()."_".
+            $_taxRateRequest->getPostcode()."_".
+            $_taxRateRequest->getCustomerClassId()."_".
+            /* ... tags */
+            Mage::registry('current_tag').'_'.
+            '';
+        /* ... layern navigation + search */
+        foreach (Mage::app()->getRequest()->getParams() as $key=>$value) {
+            $cacheKey .= $key.'-'.$value.'_';
+        }
+        return $cacheKey;
+    }
 
     public function getCacheTags()
     {
-		if(!$this->_isCacheActive()) {
-			return parent::getCacheTags();
-		}
-		$cacheTags = array(
-			Mage_Catalog_Model_Category::CACHE_TAG,
-			Mage_Catalog_Model_Category::CACHE_TAG.'_'.$this->_category->getId()
-		);
-		return $cacheTags;
-	}
+        if (!$this->_isCacheActive()) {
+            return parent::getCacheTags();
+        }
+        $cacheTags = array(
+            Mage_Catalog_Model_Category::CACHE_TAG,
+            Mage_Catalog_Model_Category::CACHE_TAG.'_'.$this->_category->getId()
+        );
+        return $cacheTags;
+    }
 }
