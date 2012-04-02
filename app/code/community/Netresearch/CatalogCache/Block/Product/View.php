@@ -77,6 +77,8 @@ class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Pro
 			$_product->getId().'_'.
 			/* ... for different stores */
 			Mage::App()->getStore()->getCode().'_'.
+            /* ... currency */
+            Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
 			/* ... for differnet login state */
 			$this->helper('customer')->isLoggedIn().'_'.
 			/* ... for different customer groups */

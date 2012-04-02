@@ -82,6 +82,8 @@ class Netresearch_CatalogCache_Block_Layer_View extends Mage_Catalog_Block_Layer
 			$toolbar->getLimit().'_'.
 			/* ... stores */
 			Mage::App()->getStore()->getCode().'_'.
+            /* ... currency */
+            Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
 			/* ... customer groups */
 			$_customer->getGroupId().'_'.
 			$_taxRateRequest->getCountryId()."_".$_taxRateRequest->getRegionId()."_".$_taxRateRequest->getPostcode()."_".$_taxRateRequest->getCustomerClassId()."_".

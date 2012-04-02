@@ -67,7 +67,7 @@ class Netresearch_CatalogCache_Block_Product_List extends Mage_Catalog_Block_Pro
 		$_page = $this->getPage();
 
 		$toolbar = new Mage_Catalog_Block_Product_List_Toolbar();
-		$return = 'ProductView_'.
+		$cacheKey = 'ProductView_'.
 			/* Create differnet caches for differnt...
 			 * ... categories */
 			$this->_category->getId().'_'.
@@ -83,6 +83,8 @@ class Netresearch_CatalogCache_Block_Product_List extends Mage_Catalog_Block_Pro
 			$toolbar->getLimit().'_'.
 			/* ... stores */
 			Mage::App()->getStore()->getCode().'_'.
+            /* ... currency */
+            Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
 			/* ... customer groups */
 			$_customer->getGroupId().'_'.
 			$_taxRateRequest->getCountryId()."_".$_taxRateRequest->getRegionId()."_".$_taxRateRequest->getPostcode()."_".$_taxRateRequest->getCustomerClassId()."_".
@@ -91,9 +93,9 @@ class Netresearch_CatalogCache_Block_Product_List extends Mage_Catalog_Block_Pro
 			'';
 			/* ... layern navigation + search */
             foreach(Mage::app()->getRequest()->getParams() as $key=>$value) {
-                $return .= $key.'-'.$value.'_';
+                $cacheKey .= $key.'-'.$value.'_';
             }
-        return $return;
+        return $cacheKey;
 	}
 
 

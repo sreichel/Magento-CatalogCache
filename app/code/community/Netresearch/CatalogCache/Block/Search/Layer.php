@@ -75,6 +75,8 @@ class Netresearch_CatalogCache_Block_Search_Layer extends Mage_CatalogSearch_Blo
 			$toolbar->getLimit().'_'.
 			/* ... stores */
 			Mage::App()->getStore()->getCode().'_'.
+            /* ... currency */
+            Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
 			/* ... customer groups */
 			$_customer->getGroupId().'_'.
 			$_taxRateRequest->getCountryId()."_".$_taxRateRequest->getRegionId()."_".$_taxRateRequest->getPostcode()."_".$_taxRateRequest->getCustomerClassId()."_".
