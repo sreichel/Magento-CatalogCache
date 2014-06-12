@@ -55,4 +55,24 @@ class Netresearch_CatalogCache_Model_Observer
             }
         }
     }
+
+    /**
+     * Clean review-related product cache
+     * 
+     * @param  Varien_Event_Observer $observer
+     * @return void
+     */
+    public function cleanProductCache($observer)
+    {
+        $review = $observer->getEvent()->getObject();
+        $productId = $review->getEntityPkValue();
+        $product = Mage::getModel('catalog/product')->load(
+            $productId
+        );
+
+        if ($product instanceof Mage_Catalog_Model_Product
+            && $product->getId()) {
+            $product->cleanCache();
+        }
+    }
 }
