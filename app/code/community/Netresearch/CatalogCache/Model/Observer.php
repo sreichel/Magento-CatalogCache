@@ -36,6 +36,8 @@ class Netresearch_CatalogCache_Model_Observer
 {
     public function clearProductCache($observer)
     {
+        return;
+        
         $_product = $observer['item']->getProduct();
         if(trim(Mage::getStoreConfig('catalog/frontend/refresh_cache_when_stock_is')) == "") {
             $_product->cleanCache();
@@ -64,6 +66,8 @@ class Netresearch_CatalogCache_Model_Observer
      */
     public function cleanProductCache($observer)
     {
+        return;
+
         $review = $observer->getEvent()->getObject();
         $productId = $review->getEntityPkValue();
         $product = Mage::getModel('catalog/product')->load(
