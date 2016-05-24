@@ -98,4 +98,16 @@ class Netresearch_CatalogCache_Block_Product_View extends Mage_Catalog_Block_Pro
             Mage_Catalog_Model_Product::CACHE_TAG."_".$this->getProduct()->getId()
         );
     }
+
+    /**
+     * ugly fix for Magento 1.9 form keys
+     */
+    public function _afterToHtml($html)
+    {
+        $formkey = Mage::getSingleton('core/session')->getFormKey();
+        $formkey = "/form_key/".$formkey."/";
+        $html = preg_replace("/\/form_key\/[a-zA-Z0-9,.-]+\//", $formkey, $html);
+
+        return parent::_afterToHtml($html);
+    }
 }
