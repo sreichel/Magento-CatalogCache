@@ -64,7 +64,7 @@ class Netresearch_CatalogCache_Model_Observer
      * @param  Varien_Event_Observer $observer
      * @return void
      */
-    public function cleanProductCache($observer)
+    public function cleanReviewProductCache($observer)
     {
         return;
 
@@ -77,6 +77,136 @@ class Netresearch_CatalogCache_Model_Observer
         if ($product instanceof Mage_Catalog_Model_Product
             && $product->getId()) {
             $product->cleanCache();
+        }
+    }
+
+    /**
+     * Clean tag-related product cache
+     * 
+     * @param  Varien_Event_Observer $observer
+     * @return void
+     */
+    public function cleanTagProductCache($observer)
+    {
+        $tag = $observer->getObject();
+        if ($tag instanceof Mage_Tag_Model_Tag_Relation) {
+            foreach($tag->getProductIds() as $productId) {
+                Mage::app()->cleanCache(Mage_Catalog_Model_Product::CACHE_TAG.'_'.$productId);
+            }
+        }
+    }
+
+    ##################################################
+
+    public function initBlockCache(Varien_Event_Observer $observer)
+    {
+        $block  = $observer->getEvent()->getBlock();
+ 
+        if ($block instanceof Mage_Catalog_Block_Layer_View
+        || $block instanceof Mage_Catalog_Block_Product_List
+        || $block instanceof Mage_CatalogSearch_Block_Layer
+        ) {
+            $block->addData(array(
+                'cache_lifetime'    => $this->_getCacheLifetime(),
+                'cache_key'         => $this->_getCacheKey($block),
+                'cache_tags'        => $this->_getCacheTags($block),
+            ));
+        }
+    }
+
+    ##################################################
+
+    /**
+     * Netresearch_CatalogCache_Block_Layer_View
+     */
+    private function _getCacheKey($block)
+    {
+        if (!$this->_isCacheActive()) {
+            return $block->getCacheKey();
+        }
+        $_taxRateRequest = Mage::getModel('tax/calculation')->getRateRequest();
+        $_customer = Mage::getSingleton('customer/session')->getCustomer();
+        $this->_category = Mage::getSingleton('catalog/layer')->getCurrentCategory();
+        $_page = $block->getPage();
+
+        $toolbar = new Mage_Catalog_Block_Product_List_Toolbar();
+        $cacheKey = get_class($block).'_'.
+            /* Create different caches for different categories */
+            $this->_category->getId().'_'.
+            /* ... orders */
+            $toolbar->getCurrentOrder().'_'.
+            /* ... direction */
+            $toolbar->getCurrentDirection().'_'.
+            /* ... mode */
+            $toolbar->getCurrentMode().'_'.
+            /* ... page */
+            $toolbar->getCurrentPage().'_'.
+            /* ... items per page */
+            $toolbar->getLimit().'_'.
+            /* ... stores */
+            Mage::App()->getStore()->getCode().'_'.
+            /* ... currency */
+            Mage::App()->getStore()->getCurrentCurrencyCode().'_'.
+            /* ... customer groups */
+            $_customer->getGroupId().'_'.
+            $_taxRateRequest->getCountryId()."_".
+            $_taxRateRequest->getRegionId()."_".
+            $_taxRateRequest->getPostcode()."_".
+            $_taxRateRequest->getCustomerClassId()."_".
+            /* ... tags */
+            Mage::registry('current_tag').'_'.
+            '';
+        /* ... layern navigation + search */
+        foreach (Mage::app()->getRequest()->getParams() as $key => $value) {
+            $cacheKey .= $key.'-'.$value.'_';
+        }
+        return $cacheKey;
+    }
+
+    /**
+     * Netresearch_CatalogCache_Block_Layer_View
+     */
+    private function _getCacheTags($block)
+    {
+        if (!$this->_isCacheActive()) {
+            return $block->getCacheTags();
+        }
+
+        $cacheTags = array(
+            Mage_Catalog_Model_Category::CACHE_TAG,
+            Mage_Catalog_Model_Category::CACHE_TAG.'_'.$this->_category->getId()
+        );
+
+        /* 1.9 already has cache tags set ! */
+        if ($block instanceof Mage_Catalog_Block_Product_List) {
+            $ids = $block->getLoadedProductCollection()->getAllIds();
+            foreach ($ids as $id) {
+                $cacheTags[] = Mage_Catalog_Model_Product::CACHE_TAG.'_'.$id;
+            }
+        }
+
+        return $cacheTags;
+    }
+    ##################################################
+    
+    private function _isCacheActive()
+    {
+        if (!Mage::getStoreConfig('catalog/frontend/cache_list')) {
+            return false;
+        }
+
+        /* if there are any messages dont read from cache to show them */
+        if (Mage::getSingleton('core/session')->getMessages(true)->count() > 0) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public function _getCacheLifetime()
+    {
+        if ($this->_isCacheActive()) {
+            return false;
         }
     }
 }
