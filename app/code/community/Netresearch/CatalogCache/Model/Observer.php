@@ -158,7 +158,13 @@ class Netresearch_CatalogCache_Model_Observer
             '';
         /* ... layern navigation + search */
         foreach (Mage::app()->getRequest()->getParams() as $key => $value) {
-            $cacheKey .= $key.'-'.$value.'_';
+            if (is_array($value)) {
+                foreach ($value as $subKey => $subValue) {
+                    $cacheKey .= $key.'-'.$subKey.'-'.$subValue.'_';
+                }
+            } else {
+                $cacheKey .= $key.'-'.$value.'_';
+            }
         }
         return $cacheKey;
     }
